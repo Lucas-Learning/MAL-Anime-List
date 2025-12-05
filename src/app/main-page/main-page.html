@@ -1,0 +1,11 @@
+<p>Welcome to the Main Page!</p>
+<p>Here you can get the most recent updates and information for anime</p>
+<button (click)="getList()">Get Anime List</button>
+@if (animeList){
+    <p>Loading your anime list...</p>
+}
+<h2>Your Anime List:</h2>
+@for (list of animeList; track list.title){
+<p>{{list.title}}</p>
+}
+

@@ -6,7 +6,7 @@ function dec2hex(dec){
 
 function generateCodeVerifier(){
     var array = new Uint32Array(56/2);
-    console.log(crypto.getRandomValues(array));
+    crypto.getRandomValues(array)
     return Array.from(array, dec2hex).join("");
 }
 
@@ -49,3 +49,12 @@ export async function getCodeChallenge(codeVerifier){
         console.log(error)
     }
 }
+
+function setToken(token) {
+    sessionStorage.setIteam('access_token', token);
+}
+function getToken() {
+    return sessionStorage.getItem('access_token');
+}
+
+
