@@ -1,15 +1,20 @@
-.buttons {
+.menu {
+    width: 70%;
     display: flex;
-    flex-wrap: wrap;
+    margin: auto;
     justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 40px;
+    margin-bottom: 10px;
+    /* border: 3px solid #a0a0a0; */
+    padding: 10px;
+    border-radius: 8px;
 }
-.buttons button{
+.menu button{
+    transition: 0.2s;
     font-weight: bold;
-    background-color: #019be2;
-    border: none;
+    background-color: #545752;
     color: white;
+    border: none;
     padding: 10px 24px;
     text-align: center;
     text-decoration: none;
@@ -19,22 +24,52 @@
     cursor: pointer;
     border-radius: 12px;
 }
+.menu button:hover {
+    border: 0px solid  #ffffff;
+    transition: 0.2s;
+    background-color: #97aab9;
+    box-shadow: #ffffff 0px 0px 10px;
+}
 .ListTitle {
     margin-bottom: 15px;
-
 }
+/* .text {
+
+} */
 .anime-list {
-    display: flex; /* or use grid */
+    border: 3px solid #a0a0a0;
+    padding: 15px;
+    margin: auto;
+    border-radius: 8px;
+    display: flex;
     flex-wrap: wrap;
     gap: 15px;
-    justify-content: center; /* Align cards from top-left */
+    justify-content: center; 
 }
 .AnimeCard {
-    border: 1px solid #ccc;
+    transition: 0.2s;
+    border: 2px solid #ffffff;
     border-radius: 8px;
     padding: 10px;
     margin: 10px;
     display: inline-block;
-    width: 225px;;
-    background-color: #2c2c2c;
+    width: 231px;
+    background-color: #393b38;
+}
+.AnimeCard:hover {
+    box-shadow: #ffffff 0px 0px 10px;
+    transition: 0.3s;
+}
+.AnimeCard img {
+    border-radius: 8px;
+    border: 2px solid ;
+    border-color: #ffffff;
+}
+.AnimeInfo {
+    margin-top: 10px;
+    font-size: 18px;
+    text-align: center;
+}
+.AnimeInfo p {
+    margin: 5px;
 }

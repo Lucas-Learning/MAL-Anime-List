@@ -1,27 +1,42 @@
 <div class="main-page">
-<h1>Welcome to the Main Page!</h1>
-<h2>Here you can get the most recent updates and information for anime</h2>
-<div class="buttons">
-<button (click)="setFilter('all')" >Get Your Whole Anime List</button>
-<button (click)="setFilter('completed')">Get Completed Anime</button>
-<button (click)="setFilter('dropped')">Get Dropped Anime</button>
-<button (click)="setFilter('watching')">Get Watching Anime</button>
-<button (click)="setFilter('on_hold')">Get On-Hold Anime</button>
-</div>
 
-<h1 class="ListTitle">Your List</h1>
+<div class="text">
+<h1>Welcome!</h1>
+<h2>Here you can get the most recent updates and information for anime</h2>
+</div>
+<h1 class="ListTitle">Your Anime List</h1>
+<div class="menu">
+<button (click)="setFilter('all')" >Get Your Whole Anime List</button>
+<button (click)="setFilter('completed')">Get Completed</button>
+<button (click)="setFilter('dropped')">Get Dropped</button>
+<button (click)="setFilter('watching')">Get Watching</button>
+<button (click)="setFilter('on_hold')">Get On-Hold</button>
+<button (click)="setFilter('plan_to_watch')">Get Plan to Watch</button>
+</div>
 <div class="anime-list">
 @if (animeList().length !== 0){
 @for (list of animeList(); track list.node.id){
-    <div class="AnimeCard"><img [src]="list.node.main_picture.medium" alt="{{list.node.title}}"/>{{list.node.title}} <div>Status: {{list.list_status.status}} </div> <!-- still make so it removes the _ when there are spaces -->
+    <div class="AnimeCard"><img [src]="list.node.main_picture.medium"/><div class="AnimeInfo"><p>{{list.node.title}}</p> <p>Status:
+        @if (list.list_status.status == "plan_to_watch"){
+            plan to watch
+        }
+        @else if (list.list_status.status == "on_hold") {
+            on hold
+        }
+        @else 
+        {
+         {{list.list_status.status}}
+        }
+        </p>
     @if (list.list_status.score !== 0) 
     {
     <div>Score: {{list.list_status.score}}</div>
     }
-<!--     @else
+     @else
     {
     <div>Score: N/A</div>
-    } -->
+    }
+    </div>
 </div>
     }
 }@else

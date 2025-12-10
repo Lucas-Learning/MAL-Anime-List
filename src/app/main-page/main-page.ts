@@ -13,7 +13,7 @@ export class MainPage implements OnInit {
   //maybe make an interface for this
   animeList = signal<any[]>([]);
   fullAnimeList = signal<any[]>([]);
-  currentFilter = signal<'all' | 'completed' | 'watching' | 'on_hold' | 'dropped'>('all');
+  currentFilter = signal<'all' | 'completed' | 'watching' | 'on_hold' | 'dropped' | 'plan_to_watch'>('all');
 
   ngOnInit() {
     this.http.get<any>("http://localhost:3000/myanimelist/list", {
@@ -28,7 +28,7 @@ export class MainPage implements OnInit {
       error: (error) => console.error(error)
   });
   }
-  setFilter(filter: 'all' | 'completed' | 'watching' | 'on_hold' | 'dropped') {
+  setFilter(filter: 'all' | 'completed' | 'watching' | 'on_hold' | 'dropped' | 'plan_to_watch') {
     this.currentFilter.set(filter);
 
     if (filter === 'all') {
