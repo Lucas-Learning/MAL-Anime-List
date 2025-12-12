@@ -1,4 +1,4 @@
-.menu {
+.menu , .infoBtn {
     width: 70%;
     display: flex;
     margin: auto;
@@ -9,7 +9,7 @@
     padding: 10px;
     border-radius: 8px;
 }
-.menu button{
+.menu button, .infoBtn{
     transition: 0.2s;
     font-weight: bold;
     background-color: #545752;
@@ -23,8 +23,9 @@
     margin: 4px 2px;
     cursor: pointer;
     border-radius: 12px;
+    border:3px #393b38;
 }
-.menu button:hover {
+.menu button:hover , .infoBtn:hover {
     border: 0px solid  #ffffff;
     transition: 0.2s;
     background-color: #97aab9;

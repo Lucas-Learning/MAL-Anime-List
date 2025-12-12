@@ -13,6 +13,7 @@ export class MainPage implements OnInit {
   //maybe make an interface for this
   animeList = signal<any[]>([]);
   fullAnimeList = signal<any[]>([]);
+  animeInfo = signal<any | null>(null);
   currentFilter = signal<'all' | 'completed' | 'watching' | 'on_hold' | 'dropped' | 'plan_to_watch'>('all');
 
   ngOnInit() {
@@ -37,4 +38,21 @@ export class MainPage implements OnInit {
     }
     this.animeList.set(this.fullAnimeList().filter(a => a.list_status.status === filter));
   }
-}
+  getInfo(id: number){
+    // if we already have info and it's for the same id, skip fetching
+    if (this.animeInfo() && (this.animeInfo() as any).id === id) {
+      return;
+    }
+    this.http.post<any>("http://localhost:3000/myanimelist/info",{id},{
+      headers: {
+        Authorization: `Bearer ${this.Token}`
+      }
+    }).subscribe({
+      next: (data) =>{
+        console.log("Anime info", data)
+        this.animeInfo.set(data)
+      },
+      error: (error) => console.error(error)
+    })
+    }
+  }

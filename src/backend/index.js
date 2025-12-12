@@ -8,6 +8,7 @@ let state = "";
 let savedCodeVerifier = "";
 import {getGenerateCodeVerifier,getCodeChallenge} from './auth.js';
 import { URLSearchParams } from 'url';
+import { error } from 'console';
 const clientid = process.env.CLIENT_ID;
 const clientsecret = process.env.CLIENT_SECRET;
 
@@ -83,6 +84,30 @@ app.get("/myanimelist/list", async (req,res) =>{
 });
 
 
+
+app.post("/myanimelist/info", async (req,res) =>{
+    const { id } = req.body;
+    const accessToken = req.headers.authorization?.split(" ")[1];
+    if (!id){
+        return res.status(400).json({error: "Anime id missing"});
+    }
+      if (!accessToken) {
+        return res.status(401).json({ error: "Access token missing" });
+    }
+    try{
+        const response = await fetch(`https://api.myanimelist.net/v2/anime/${id}?fields=media_type`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${accessToken}`,
+            },
+        });
+        const data = await response.json();
+        res.json(data);
+
+    } catch (error) {
+        res.status(500).json({ error: "Failed to fetch anime list" });
+    }
+})
 
 app.listen(port, () => {
     console.log(`Backend server is running at http://localhost:${port}`);

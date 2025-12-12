@@ -16,7 +16,7 @@
 <div class="anime-list">
 @if (animeList().length !== 0){
 @for (list of animeList(); track list.node.id){
-    <div class="AnimeCard"><img [src]="list.node.main_picture.medium"/><div class="AnimeInfo"><p>{{list.node.title}}</p> <p>Status:
+    <div class="AnimeCard" (click)="getInfo(list.node.id)"><img [src]="list.node.main_picture.medium"/><div class="AnimeInfo"><p>{{list.node.title}}</p> <p>Status:
         @if (list.list_status.status == "plan_to_watch"){
             plan to watch
         }
