@@ -1,1 +1,10 @@
-<p>modal works!</p>
+<div class="modal" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <!-- MAKE A LOAD TEMPLATE PLEASE-->
+        <h2>Anime Details</h2>
+        <p>Title: {{mainPage.animeInfo().title}}</p>
+        <img [src]="mainPage.animeInfo().pictures[1].medium" alt="Anime Image"/>   
+        <p>Media: {{mainPage.animeInfo().media_type}}</p>
+        <button (click)="closeModal()">Close</button>
+    </div>
+</div>

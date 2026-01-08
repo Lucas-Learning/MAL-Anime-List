@@ -96,16 +96,22 @@ app.get("/myanimelist/list", async (req,res) =>{
 
 app.post("/myanimelist/info", async (req,res) =>{
     const { id } = req.body;
-    const accessToken = req.headers.authorization?.split(" ")[1];
+    const sessionId = req.headers['x-session-id'];
+
+    if (!sessionId) {
+        return res.status(401).json({ error: "Session id missing" });
+    }
     
     if (!id){
         return res.status(400).json({error: "Anime id missing"});
     }
-      if (!accessToken) {
-        return res.status(401).json({ error: "Access token missing" });
+    const session = sessions.get(sessionId);
+    if (!session){
+        return res.status(401).json({error: "Invalid or expired session"})
     }
+    const accessToken = session.access_token
     try{
-        const response = await fetch(`https://api.myanimelist.net/v2/anime/${id}?fields=media_type`, {
+        const response = await fetch(`https://api.myanimelist.net/v2/anime/${id}?fields=id,title,main_picture,alternative_titles,start_date,end_date,synopsis,rank,popularity,nsfw,media_type,genres,num_episodes,start_season,broadcast,source,rating,pictures,background,recommendations,studios,statistics`, {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${accessToken}`,

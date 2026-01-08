@@ -1,10 +1,11 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../auth-service';
+import { Modal } from "../modal/modal";
 
 @Component({
   selector: 'app-main-page',
-  imports: [],
+  imports: [Modal],
   templateUrl: './main-page.html',
   styleUrl: './main-page.css',
 })
@@ -17,6 +18,9 @@ export class MainPage implements OnInit {
   fullAnimeList = signal<any[]>([]);
   animeInfo = signal<any | null>(null);
   currentFilter = signal<'all' | 'completed' | 'watching' | 'on_hold' | 'dropped' | 'plan_to_watch'>('all');
+  animeCache = signal<Record<number, any>>({});
+  isModalVisible = false;
+
   ngOnInit() {
     const sessionId = this.authService.getSessionId();
 
@@ -36,6 +40,14 @@ export class MainPage implements OnInit {
       error: (error) => console.error(error)
   });
   }
+  showModal() {
+	this.isModalVisible = true;
+  }
+
+  hideModal() {
+	this.isModalVisible = false;
+  }
+
   setFilter(filter: 'all' | 'completed' | 'watching' | 'on_hold' | 'dropped' | 'plan_to_watch') {
     this.currentFilter.set(filter);
 
@@ -45,10 +57,14 @@ export class MainPage implements OnInit {
     }
     this.animeList.set(this.fullAnimeList().filter(a => a.list_status.status === filter));
   }
+
   getInfo(id: number){
-    if (this.animeInfo() && (this.animeInfo() as any).id === id) {
+    const cached = this.animeCache()[id];
+    if (cached) {
+      this.animeInfo.set(cached);
       return;
     }
+
     const sessionId = this.authService.getSessionId();
 
     if (!sessionId) {
@@ -62,10 +78,15 @@ export class MainPage implements OnInit {
       }
     }).subscribe({
       next: (data) =>{
-        console.log("Anime info", data)
-        this.animeInfo.set(data)
+        this.animeCache.update(cache => ({
+          ...cache,
+          [id]: data
+        }));
+        this.animeInfo.set(data);
+        console.log("Anime info", this.animeInfo());
       },
       error: (error) => console.error(error)
     })
-    }
+    
+  }
   }

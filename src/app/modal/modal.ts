@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MainPage } from '../main-page/main-page';
 
 @Component({
   selector: 'app-modal',
@@ -7,5 +9,9 @@ import { Component } from '@angular/core';
   styleUrl: './modal.css',
 })
 export class Modal {
-
+  constructor(public mainPage: MainPage) {}
+  @Output() close = new EventEmitter<void>();
+  closeModal(): void{
+    this.close.emit();
+  }
 }
