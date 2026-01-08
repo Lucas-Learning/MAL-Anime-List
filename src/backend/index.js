@@ -83,8 +83,6 @@ app.get("/myanimelist/list", async (req,res) =>{
     }
 });
 
-
-
 app.post("/myanimelist/info", async (req,res) =>{
     const { id } = req.body;
     const accessToken = req.headers.authorization?.split(" ")[1];
