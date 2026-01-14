@@ -108,6 +108,7 @@ export class MainPage implements OnInit {
       this.animeInfo.set(cached);
       return;
     }
+    
     const sessionId = this.authService.getSessionId();
     if (!sessionId) {
     console.error("No session ID found!");
@@ -125,6 +126,9 @@ export class MainPage implements OnInit {
           [id]: data
         }));
         this.animeInfo.set(data);
+        if(!this.animeInfo().studios[0]){
+          this.animeInfo().studios[0] = {name: 'N/A'};
+        }
         console.log("Anime info", this.animeInfo());
       },
       error: (error) => console.error(error)
