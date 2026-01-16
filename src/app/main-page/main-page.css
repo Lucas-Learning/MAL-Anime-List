@@ -1,3 +1,7 @@
+.main-page{
+    font-family: sans-serif;
+}
+
 .menu , .infoBtn {
     width: 70%;
     display: flex;
@@ -10,27 +14,29 @@
     border-radius: 8px;
 }
 .menu button, .infoBtn{
-    transition: 0.2s;
-    font-weight: bold;
-    background-color: #545752;
-    color: white;
-    border: none;
-    padding: 10px 24px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-    border-radius: 12px;
-    border:3px #393b38;
-    box-shadow: #ffffff 0px 0px 5px;
+   padding: 1.3em 3em;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  font-weight: 500;
+  color: #ffffff;
+  background-color: #545752;
+  border: none;
+  border-radius: 45px;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease 0s;
+  cursor: pointer;
+  outline: none;
+  margin-left: 20px;
 }
 .menu button:hover , .infoBtn:hover {
-    border: 0px solid  #ffffff;
-    transition: 0.2s;
-    background-color: #97aab9;
-    box-shadow: #000000 0px 0px 10px;
+ background-color: #7c7c7c;
+  box-shadow: 0px 15px 20px rgba(92, 92, 92, 0.4);
+  color: #fff;
+  transform: translateY(-7px);
+}
+.modal-content button:active{
+  transform: translateY(-1px);
 }
 .ListTitle {
     margin-bottom: 15px;
@@ -48,6 +54,12 @@
     gap: 15px;
     justify-content: center; 
 }
+@media (min-width: 600px) {
+    .infoBtn{
+        display: none;
+    }
+}
+
 .AnimeCard {
     transition: 0.3s;
     border: 2px solid #ffffff;
@@ -57,10 +69,12 @@
     display: inline-block;
     width: 231px;
     background-color: #393b38;
+    transition: 0.2s;
 }
 .AnimeCard:hover {
     box-shadow: #ffffff 0px 0px 10px;
     transition: 0.3s;
+    margin-top: -7px;
 }
 .AnimeCard img {
     border-radius: 8px;

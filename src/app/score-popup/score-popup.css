@@ -1,23 +1,41 @@
 .popup-content button{
-    transition: 0.2s;
-    font-weight: bold;
-    background-color: #545752;
-    color: white;
-    border: none;
-    padding: 10px 24px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 10px 2px;
-    cursor: pointer;
-    border-radius: 12px;
-    border:3px #393b38;
-    box-shadow: #ffffff 0px 0px 5px;
+  padding: 1.3em 3em;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  font-weight: 500;
+  color: #ffffff;
+  background-color: #545752;
+  border: none;
+  border-radius: 45px;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease 0s;
+  cursor: pointer;
+  outline: none;
+  margin: 10px;
 }
 .popup-content button:hover{
-    border: 0px solid  #ffffff;
-    transition: 0.2s;
-    background-color: #97aab9;
-    box-shadow: #000000 0px 0px 10px;
+background-color: #7c7c7c;
+  box-shadow: 0px 15px 20px rgba(92, 92, 92, 0.4);
+  color: #fff;
+  transform: translateY(-7px);
+}
+.popup-content button:active{
+    transform: translateY(-1px);
+}
+.scoreInput{
+  max-width: 190px;
+  padding: 0.875rem;
+  font-size: 1rem;
+  border: 1.5px solid #000;
+  border-radius: 0.5rem;
+  box-shadow: 2.5px 3px 0 #000;
+  outline: none;
+  transition: ease 0.25s;
+}
+.scoreInput:focus{
+    box-shadow: 5.5px 7px 0 black
+}
+.scoreInput:hover{
+    box-shadow: 5.5px 7px 0 black
 }

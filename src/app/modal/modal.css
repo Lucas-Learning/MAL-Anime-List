@@ -1,4 +1,5 @@
 .modal {
+  font-family: sans-serif;
 position: fixed;
   top: 0;
   left: 0;
@@ -18,14 +19,15 @@ body.blocked {
   border-radius: 10px;
   text-align: center;
   font-size: 18px;
+  min-width: 1000px;
   max-width: 1000px;
   max-height: 80%;
-overflow-y: auto;
-   border: 2px solid #ffffff;
-    border-radius: 8px;
-    padding: 10px;
-    margin: 10px;
-    display: inline-block;
+  overflow-y: auto;
+  border: 2px solid #ffffff;
+  border-radius: 8px;
+  padding: 10px;
+  margin: 10px;
+  display: inline-block;
 }
 
 .modal-content p{
@@ -33,27 +35,29 @@ overflow-y: auto;
     line-height: 1.5;
 }
 .modal-content button{
-    transition: 0.2s;
-    font-weight: bold;
-    background-color: #545752;
-    color: white;
-    border: none;
-    padding: 10px 24px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 10px 2px;
-    cursor: pointer;
-    border-radius: 12px;
-    border:3px #393b38;
-    box-shadow: #ffffff 0px 0px 5px;
+  padding: 1.3em 3em;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  font-weight: 500;
+  color: #ffffff;
+  background-color: #545752;
+  border: none;
+  border-radius: 45px;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease 0s;
+  cursor: pointer;
+  outline: none;
+  margin: 10px;
 }
 .modal-content button:hover{
-    border: 0px solid  #ffffff;
-    transition: 0.2s;
-    background-color: #97aab9;
-    box-shadow: #000000 0px 0px 10px;
+ background-color: #7c7c7c;
+  box-shadow: 0px 15px 20px rgba(92, 92, 92, 0.4);
+  color: #fff;
+  transform: translateY(-7px);
+}
+.modal-content button:active{
+  transform: translateY(-1px);
 }
 .AnimeCard {
     border-radius: 8px;

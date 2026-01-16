@@ -1,9 +1,15 @@
 <div class="popup-overlay" (click)="closePopup()">
   <div class="popup-content" (click)="$event.stopPropagation()">
-	<h3>
-        <input type="number" [(ngModel)]="score" [max]="10" [min]="1" (keydown.enter)="onSubmit()"/>
+	  <h3>
+        <input class="scoreInput" type="number" [(ngModel)]="score" [max]="10" [min]="0" (keydown.enter)="onSubmit()"/>
     </h3>
-    <h1>Score: {{score}}</h1>
+    <h1>Score: @if(score === 0){
+      N/A
+      }
+      @else {
+        {{score}}
+      }
+      </h1>
 	<button (click)="onSubmit()" (click)="showPopup()">Submit</button>
     <!--@if (isPopupVisible){
         <app-popup (close)="hidePopup()"></app-popup>
