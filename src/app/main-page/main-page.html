@@ -11,7 +11,11 @@
 <button (click)="setFilter('plan_to_watch')">Get Plan to Watch</button>
 <button  (click)="logOut()">Log Out</button>
 </div>
+<div class="search-div">
+<input class="searchBox"type="text" placeholder="Search..." (input)="onSearch($event)">
+</div>
 <div class="anime-list">
+
 @for (list of animeList(); track list.node.id){
     <div class="AnimeCard" (click)="getInfo(list.node.id)"><img [src]="list.node.main_picture.medium"/><div class="AnimeInfo"><p>{{list.node.title}}</p> <p>Status:
         @if (list.list_status.status == "plan_to_watch"){
@@ -20,7 +24,7 @@
         @else if (list.list_status.status == "on_hold") {
             on hold
         }
-        @else 
+        @else
         {
          {{list.list_status.status}}
         }
@@ -35,7 +39,6 @@
     }
     </div>
 </div>
-
     }
     @if (animeList().length !== 0){
      @if (isModalVisible){

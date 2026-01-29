@@ -88,6 +88,12 @@ export class MainPage implements OnInit {
       }
     })
   }
+  onSearch(event: Event){
+    const input = event.target as HTMLInputElement;
+    const filter = input.value.toLowerCase();
+    this.animeList.set(this.fullAnimeList().filter(a => a.node.title.toLowerCase().includes(filter)));
+  }
+  
   logOut(){
     sessionStorage.removeItem('session_id');
     sessionStorage.removeItem('access_token');
@@ -178,6 +184,9 @@ export class MainPage implements OnInit {
       },
       error: (error) => console.error(error)
     })
+  }
+  searchFilter(filter: string){
+    this.animeList.set(this.fullAnimeList().filter(a => a.list === filter));
   }
   addToWatchLater(id: number){
     const sessionId = this.authService.getSessionId();
