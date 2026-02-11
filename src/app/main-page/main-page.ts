@@ -168,7 +168,7 @@ export class MainPage implements OnInit {
     }).subscribe({ 
       next: (AnimeData) => {
         this.fullAnimeList.set(AnimeData.data);
-        this.setFilter('all');
+        this.setFilter(this.currentFilter());
       },
       error: (error) => console.error(error)
   });

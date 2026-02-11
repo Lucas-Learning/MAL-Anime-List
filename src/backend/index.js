@@ -1,5 +1,8 @@
 import express from 'express';
 import crypto from 'crypto';
+import sqlite3 from 'sqlite3';
+import { execute,executeInsert, fetchAll, fetchFirst } from './sql.js';
+import rateLimit from 'express-rate-limit'
 import 'dotenv/config';
 import cors from 'cors';
 const app = express();
@@ -9,33 +12,92 @@ import { URLSearchParams } from 'url';
 
 const clientid = process.env.CLIENT_ID;
 const clientsecret = process.env.CLIENT_SECRET;
-const sessions = new Map();
-const loginStates = new Map();
+const db = new sqlite3.Database('Auth.db', sqlite3.OPEN_READWRITE);
+try {
+    await execute(db, `CREATE TABLE IF NOT EXISTS OAuth(
+        state TEXT NOT NULL,
+        code_verifier TEXT NOT NULL)`)
+}
+catch (error){
+    console.log(error);
+}
+try {
+    await execute(db, `CREATE TABLE IF NOT EXISTS Sessions(
+        sessionid TEXT NOT NULL PRIMARY KEY,
+        token_type TEXT NOT NULL,
+        expires_in INTEGER NOT NULL,
+        access_token TEXT NOT NULL,
+        refresh_token TEXT NOT NULL)`)
+}
+catch (error){
+    console.log(error);
+}
+try {
+    await execute(db,`ALTER TABLE Sessions ADD COLUMN created_at INTEGER`);
+    console.log("created_at column added");
+    await execute(db,`DELETE FROM Sessions WHERE (created_at + (expires_in * 1000)) < ?`, [Date.now()]);
+} 
+catch (error) {
+    if (!error.message.includes("Duplicate column")) {
+        console.log("Alter table error:", error);
+    }
+}
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: 'Too many requests, please try again later.'
+});
+const sqlOAuth = `INSERT INTO OAuth(state, code_verifier) VALUES(?,?)`;
+const sqlSessions = `INSERT INTO Sessions(sessionid, token_type, expires_in, access_token, refresh_token, created_at) VALUES(?,?,?,?,?,?)`;
+app.use(limiter);
 app.use(cors());
 app.use(express.json());
 
-/*app.get("/", (req, res) => {
-    res.send(`Generated code verifier: ${codeVerifier}, Generated code challenge: ${codeChallenge}`);
-});*/
+
 
 app.get("/auth/url", async (req,res)=>{
 const state = crypto.randomBytes(16).toString("hex");
 const codeVerifier = getGenerateCodeVerifier();
 const codeChallenge = codeVerifier
-//savedCodeVerifier = codeVerifier;
 
-loginStates.set(state, codeVerifier)
+try {
+    await executeInsert(db, sqlOAuth, [state, codeVerifier]);
+}
+catch (error){
+    console.log(error);
+}
 let url = `https://myanimelist.net/v1/oauth2/authorize?response_type=code&client_id=${clientid}&state=${state}&redirect_uri=http://localhost:4200/mal-callback&code_challenge=${codeChallenge}&code_challenge_method=plain`
 res.redirect(url);
 });
 
 app.post("/auth/callback", async (req,res) =>{
+await execute(
+    db,
+    `DELETE FROM Sessions 
+     WHERE (created_at + (expires_in * 1000)) < ?`,
+    [Date.now()]
+);
 const { code, state: returnedState } =  req.body;
-const codeVerifier = loginStates.get(returnedState);
-if (!codeVerifier) {
+let sql = `SELECT code_verifier FROM OAuth WHERE state = ?`;
+let codeVerifierSql = null;
+try {
+    codeVerifierSql = await fetchFirst(db,sql,[returnedState]);
+}
+catch (error){
+    console.log(error);
+}
+
+if (!codeVerifierSql) {
     return res.status(400).send("Invalid state");
 }
-loginStates.delete(returnedState);
+const codeVerifier = codeVerifierSql.code_verifier;
+const sqlDelete = `DELETE FROM OAuth WHERE state = ?`;
+try {
+    await execute(db,sqlDelete, [returnedState]);
+}
+catch (error){
+    console.log(error);
+}
 
 const params = new URLSearchParams({
     client_id: clientid,
@@ -60,7 +122,20 @@ try {
     }
     const sessionId = crypto.randomUUID();
     const data = await response.json();
-    sessions.set(sessionId, data);
+    let sessionFromDb = null; 
+    let sql = `SELECT sessionid FROM sessions WHERE sessionid = ?`;
+    try {
+        await executeInsert(db,sqlSessions, [sessionId, data.token_type, data.expires_in, data.access_token, data.refresh_token, Date.now()]);
+    }
+    catch (error){
+        console.log(error);
+    }
+    try{
+        sessionFromDb = await fetchFirst(db,sql,[sessionId]);
+    }
+    catch (error){
+        console.log(error);
+    }
     res.json({sessionId});
 } catch (error) {
     res.status(500).json({ error: "Failed to fetch token" });
@@ -69,11 +144,22 @@ try {
 
 app.get("/myanimelist/list", async (req,res) =>{
     const sessionId = req.headers['x-session-id'];
-
     if (!sessionId) {
         return res.status(401).json({ error: "Session id missing" });
     }
-    const session = sessions.get(sessionId);
+    const sql = `SELECT * FROM sessions WHERE sessionid = ?`;
+    let session = null;
+    try {
+        session = await fetchFirst(db,sql,[sessionId]);
+    }
+    catch (error){
+        console.log(error);
+    }
+    if (Date.now() > session.created_at + session.expires_in * 1000) 
+    {
+    await execute(db, `DELETE FROM Sessions WHERE sessionid = ?`, [sessionId]);
+    return res.status(401).json({ error: "Session expired" });
+    }
     if (!session){
         return res.status(401).json({error: "Invalid or expired session"})
     }
@@ -104,7 +190,19 @@ app.post("/myanimelist/info", async (req,res) =>{
     if (!id){
         return res.status(400).json({error: "Anime id missing"});
     }
-    const session = sessions.get(sessionId);
+   const sql = `SELECT * FROM sessions WHERE sessionid = ?`;
+    let session = null;
+    try {
+        session = await fetchFirst(db,sql,[sessionId]);
+    }
+    catch (error){
+        console.log(error);
+    }
+    if (Date.now() > session.created_at + session.expires_in * 1000) 
+    {
+    await execute(db, `DELETE FROM Sessions WHERE sessionid = ?`, [sessionId]);
+    return res.status(401).json({ error: "Session expired" });
+    }
     if (!session){
         return res.status(401).json({error: "Invalid or expired session"})
     }
@@ -133,7 +231,19 @@ app.post("/myanimelist/update-status", async (req,res) =>{
     if (!id){
         return res.status(400).json({error: "Anime id missing"});
     }
-    const session = sessions.get(sessionId);
+    const sql = `SELECT * FROM sessions WHERE sessionid = ?`;
+    let session = null;
+    try {
+        session = await fetchFirst(db,sql,[sessionId]);
+    }
+    catch (error){
+        console.log(error);
+    }
+    if (Date.now() > session.created_at + session.expires_in * 1000) 
+    {
+    await execute(db, `DELETE FROM Sessions WHERE sessionid = ?`, [sessionId]);
+    return res.status(401).json({ error: "Session expired" });
+    }
     if (!session){
         return res.status(401).json({error: "Invalid or expired session"})
     }
@@ -152,7 +262,6 @@ app.post("/myanimelist/update-status", async (req,res) =>{
             })
             
         });
-        console.log(score);
         const data = await response.json();
         res.json(data);
     }
@@ -170,7 +279,19 @@ app.delete("/myanimelist/remove/:id", async (req,res) =>{
      if (!id){
         return res.status(400).json({error: "Anime id missing"});
     }
-    const session = sessions.get(sessionId);
+    const sql = `SELECT * FROM sessions WHERE sessionid = ?`;
+    let session = null;
+    try {
+        session = await fetchFirst(db,sql,[sessionId]);
+    }
+    catch (error){
+        console.log(error);
+    }
+    if (Date.now() > session.created_at + session.expires_in * 1000) 
+    {
+    await execute(db, `DELETE FROM Sessions WHERE sessionid = ?`, [sessionId]);
+    return res.status(401).json({ error: "Session expired" });
+    }
     if (!session){
         return res.status(401).json({error: "Invalid or expired session"})
     }
@@ -189,6 +310,17 @@ app.delete("/myanimelist/remove/:id", async (req,res) =>{
         res.status(500).json({ error: "Failed to remove anime" });
     }
 })
+setInterval(async () => {
+    try {
+        const now = Date.now();
+
+        await execute(db, `DELETE FROM sessions WHERE (created_at + (expires_in *1000)) < ?`,[now]);
+        console.log("Expired sessions cleaned up");
+    }
+    catch (error){
+        console.log("Cleanup error: ", error);
+    }
+}, 60 * 60 * 1000);
 
 app.listen(port, () => {
     console.log(`Backend server is running at http://localhost:${port}`);
