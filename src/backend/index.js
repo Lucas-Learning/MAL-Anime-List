@@ -91,9 +91,9 @@ if (!codeVerifierSql) {
     return res.status(400).send("Invalid state");
 }
 const codeVerifier = codeVerifierSql.code_verifier;
-const sqlDelete = `DELETE FROM OAuth WHERE state = ?`;
+const sqlDelete = `DELETE FROM OAuth WHERE code_verifier = ?`;
 try {
-    await execute(db,sqlDelete, [returnedState]);
+    await execute(db,sqlDelete, [codeVerifier]);
 }
 catch (error){
     console.log(error);
@@ -123,7 +123,7 @@ try {
     const sessionId = crypto.randomUUID();
     const data = await response.json();
     let sessionFromDb = null; 
-    let sql = `SELECT sessionid FROM sessions WHERE sessionid = ?`;
+    let sql = `SELECT sessionid FROM Sessions WHERE sessionid = ?`;
     try {
         await executeInsert(db,sqlSessions, [sessionId, data.token_type, data.expires_in, data.access_token, data.refresh_token, Date.now()]);
     }
@@ -147,7 +147,7 @@ app.get("/myanimelist/list", async (req,res) =>{
     if (!sessionId) {
         return res.status(401).json({ error: "Session id missing" });
     }
-    const sql = `SELECT * FROM sessions WHERE sessionid = ?`;
+    const sql = `SELECT * FROM Sessions WHERE sessionid = ?`;
     let session = null;
     try {
         session = await fetchFirst(db,sql,[sessionId]);
@@ -190,7 +190,7 @@ app.post("/myanimelist/info", async (req,res) =>{
     if (!id){
         return res.status(400).json({error: "Anime id missing"});
     }
-   const sql = `SELECT * FROM sessions WHERE sessionid = ?`;
+   const sql = `SELECT * FROM Sessions WHERE sessionid = ?`;
     let session = null;
     try {
         session = await fetchFirst(db,sql,[sessionId]);
@@ -231,7 +231,7 @@ app.post("/myanimelist/update-status", async (req,res) =>{
     if (!id){
         return res.status(400).json({error: "Anime id missing"});
     }
-    const sql = `SELECT * FROM sessions WHERE sessionid = ?`;
+    const sql = `SELECT * FROM Sessions WHERE sessionid = ?`;
     let session = null;
     try {
         session = await fetchFirst(db,sql,[sessionId]);
@@ -279,7 +279,7 @@ app.delete("/myanimelist/remove/:id", async (req,res) =>{
      if (!id){
         return res.status(400).json({error: "Anime id missing"});
     }
-    const sql = `SELECT * FROM sessions WHERE sessionid = ?`;
+    const sql = `SELECT * FROM Sessions WHERE sessionid = ?`;
     let session = null;
     try {
         session = await fetchFirst(db,sql,[sessionId]);
@@ -314,7 +314,7 @@ setInterval(async () => {
     try {
         const now = Date.now();
 
-        await execute(db, `DELETE FROM sessions WHERE (created_at + (expires_in *1000)) < ?`,[now]);
+        await execute(db, `DELETE FROM Sessions WHERE (created_at + (expires_in *1000)) < ?`,[now]);
         console.log("Expired sessions cleaned up");
     }
     catch (error){
